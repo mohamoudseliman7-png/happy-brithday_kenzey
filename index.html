@@ -26,7 +26,7 @@
     h1 { font-size:clamp(2rem,7vw,4rem); line-height:1.4; margin:14px 0; }
     p { line-height:1.9; }
     .heart {
-      font-size:clamp(8rem,30vw,15rem); line-height:1;
+      font-size:clamp(7rem,25vw,13rem); line-height:1;
       display:inline-block; filter:drop-shadow(0 0 22px #ff174f);
       animation: heartbeat 1.25s infinite;
     }
@@ -45,40 +45,59 @@
     }
     .btn:hover { transform:translateY(-2px) scale(1.02); filter:brightness(1.08); }
     .hint { min-height:1.5em; color:#ffc3d0; font-size:.92rem; }
-    .rose { font-size:clamp(8rem,28vw,14rem); line-height:1.2; filter:drop-shadow(0 0 22px #ff174f70); animation: roseFloat 3s ease-in-out infinite; }
+    .rose { font-size:clamp(7rem,25vw,13rem); line-height:1.2; filter:drop-shadow(0 0 22px #ff174f70); animation: roseFloat 3s ease-in-out infinite; }
     .wish { font-size:clamp(1.2rem,4vw,1.8rem); color:#ffd3de; }
-    .love-card {
-      margin:22px auto; padding:clamp(20px,5vw,34px); border-radius:26px;
-      border:1px solid #ff789a70; background:#35091bb8;
-      box-shadow:0 0 50px #ff174f18; backdrop-filter:blur(5px);
+    
+    /* تصميم الكروت المتعددة المليئة بالكلام الجميل */
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px auto;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 5px;
     }
-    .love-lines { font-size:clamp(1.05rem,3.5vw,1.35rem); line-height:2.15; }
-    .love-lines p { margin:7px 0; opacity:0; animation: riseIn .8s ease forwards; }
-    .love-lines p:nth-child(2){animation-delay:.25s}
-    .love-lines p:nth-child(3){animation-delay:.5s}
-    .love-lines p:nth-child(4){animation-delay:.75s}
-    .love-lines p:nth-child(5){animation-delay:1s}
-    .music-box { margin:22px auto 0; padding:16px; border:1px solid #ff789a55; border-radius:18px; background:#17040bbd; }
-    audio { width:min(420px,100%); margin-top:10px; }
+    .love-card {
+      padding: clamp(18px, 4vw, 26px); border-radius: 22px;
+      border: 1px solid #ff789a70; background: #35091bb8;
+      box-shadow: 0 0 30px #ff174f18; backdrop-filter: blur(5px);
+      text-align: right;
+    }
+    .love-card h3 {
+      color: #ff9ab2;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+    .love-lines { font-size: clamp(1rem, 3vw, 1.2rem); line-height: 1.8; color: #fff; }
+
+    .music-box { margin: 15px auto 0; padding: 12px; border: 1px solid #ff789a55; border-radius: 18px; background: #17040bbd; }
+    audio { width: min(380px, 100%); margin-top: 8px; }
+    
     .petal {
       position:fixed; top:-12vh; z-index:1; pointer-events:none; opacity:.9;
       animation: fall linear forwards; filter:drop-shadow(0 0 5px #ff214f55);
     }
     .spark { position:fixed; z-index:0; color:#ff7b9a; opacity:.65; animation: twinkle 2s ease-in-out infinite alternate; }
-    .footer { color:#d88a9e; font-size:.8rem; margin-top:24px; }
+    .footer { color:#d88a9e; font-size:.8rem; margin-top:15px; }
+    
     @keyframes heartbeat { 0%,100%{transform:scale(1)} 15%{transform:scale(1.09)} 30%{transform:scale(1)} 45%{transform:scale(1.05)} }
     @keyframes roseFloat { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
     @keyframes fadeIn { from{opacity:0; transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes riseIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fall { to{transform:translate3d(var(--drift),115vh,0) rotate(var(--spin)); opacity:.15} }
     @keyframes twinkle { from{transform:scale(.7);opacity:.25} to{transform:scale(1.2);opacity:.8} }
-    @media (prefers-reduced-motion: reduce) {
-      *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; }
-    }
   </style>
 </head>
 <body>
+
+  <!-- عنصر الصوت ليعمل تلقائياً عند الدخول -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="song.mp3" type="audio/mpeg">
+    المتصفح لا يدعم تشغيل الصوت.
+  </audio>
+
   <main>
+    <!-- شاشة البداية وتاريخ الميلاد -->
     <section class="screen active" id="welcome">
       <div class="content">
         <div class="eyebrow">عندي ليكي مفاجأة صغيرة ✨</div>
@@ -96,39 +115,53 @@
       </div>
     </section>
 
+    <!-- شاشة الأمنية -->
     <section class="screen" id="wishScreen">
       <div class="content">
         <div class="eyebrow">خدي نفس عميق… ❤️</div>
         <div class="rose" aria-hidden="true">🌹</div>
         <h1>أتمنى أمنية</h1>
         <p class="wish">غمّضي عينيكي لحظة، واتمني من قلبك…</p>
-        <button class="btn" id="revealBtn">جاهزة للمفاجأة؟ 🌹</button>
+        <button class="btn" id="revealBtn">جاهزة لكروت الحب؟ 🌹</button>
       </div>
     </section>
 
+    <!-- شاشة كروت الحب المتعددة والموسيقى -->
     <section class="screen" id="loveScreen">
       <div class="content">
         <div class="eyebrow">إلى كنزي، في يومها الجميل ✨</div>
-        <h1>كل سنة وانتي أجمل حكاية ❤️</h1>
-        <div class="love-card">
-          <div class="love-lines">
-            <p>كل سنة وانتي طيبة يا كنزي، ويا رب أيامك كلها فرحة وضحكة من قلبك.</p>
-            <p>وجودك بيخلّي للحاجات الصغيرة معنى أجمل، وبيخلّي اليوم العادي مميز.</p>
-            <p>أتمنالك سنة مليانة راحة بال، ونجاح، وأمنيات تتحقق واحدة ورا التانية.</p>
-            <p>تفضلي دايمًا محاطة بالحب، والناس اللي يقدّروا قلبك الجميل.</p>
-            <p>عيد ميلاد سعيد يا كنزي… وتفضلي دايمًا منوّرة الدنيا بطريقتك 💖</p>
+        <h1>رسائل من قلبي لكي ❤️</h1>
+        
+        <div class="cards-container">
+          <div class="love-card">
+            <h3>💌 البداية والعمُر</h3>
+            <p class="love-lines">كل سنة وانتي طيبة يا كنزي، ويا رب أيامك كلها فرحة وضحكة من قلبك. وجودك بيخلّي للحاجات الصغيرة معنى أجمل، وبيخلّي اليوم العادي مميز جداً بالنسبة لي.</p>
+          </div>
+          
+          <div class="love-card">
+            <h3>🌹 أمنيات السعادة</h3>
+            <p class="love-lines">أتمنالك سنة مليانة راحة بال، ونجاح، وأمنيات تتحقق واحدة ورا التانية. تفضلي دايمًا محاطة بالحب، والناس اللي يقدّروا قلبك الجميل والنقي.</p>
+          </div>
+
+          <div class="love-card">
+            <h3>✨ عهود الحب</h3>
+            <p class="love-lines">لو تطلبي مني عينيّا، لو تطلبي عمري كمان.. هيديكي سنيني الجاية وهكون راضي وفرحان بوجودك جمبي في كل خطوة يا أجمل أقدار حياتي.</p>
+          </div>
+
+          <div class="love-card">
+            <h3>👑 دايماً منورة الدنيا</h3>
+            <p class="love-lines">أعدكِ ألا أترك يدكِ أبداً، وأن أكون سندك وفارسك في كل خطوة. عيد ميلاد سعيد يا كنزي.. وتفضلي دايمًا منوّرة الدنيا بطريقتك الخاصة الخاطفة لقلبي 💖</p>
           </div>
         </div>
+
         <div class="music-box">
-          <strong>🎵 أغنية ليكي</strong>
-          <p>ضيف ملف الأغنية باسم <b>song.mp3</b> بجانب ملف الموقع، وبعدها شغّليها من هنا.</p>
-          <audio id="song" controls preload="none">
+          <strong>🎵 الأغنية الخاصة بيكي</strong>
+          <audio id="songControl" controls>
             <source src="song.mp3" type="audio/mpeg">
-            المتصفح لا يدعم تشغيل الصوت.
           </audio>
-          <p class="hint">ملاحظة: استخدمي ملفًا صوتيًا تملكين حق استخدامه أو رابطًا مرخّصًا.</p>
         </div>
-        <button class="btn" id="morePetals" style="margin-top:18px">نزّلي ورد أكتر 🌹</button>
+
+        <button class="btn" id="morePetals" style="margin-top:14px">نزّلي ورد أكتر 🌹</button>
         <div class="footer">مع أطيب الأمنيات ليكي في سنتك الجديدة 💗</div>
       </div>
     </section>
@@ -139,6 +172,19 @@
     const birthdayForm = document.getElementById('birthdayForm');
     const birthdayInput = document.getElementById('birthday');
     const dateHint = document.getElementById('dateHint');
+    const bgMusic = document.getElementById('bg-music');
+    const songControl = document.getElementById('songControl');
+
+    // محاولة تشغيل الموسيقى فور فتح الصفحة
+    window.addEventListener('load', () => {
+      bgMusic.play().catch(() => {
+        document.body.addEventListener('click', () => {
+          if (bgMusic.paused) {
+            bgMusic.play();
+          }
+        }, { once: true });
+      });
+    });
 
     function showScreen(id) {
       screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
@@ -151,11 +197,14 @@
         dateHint.textContent = 'اختاري تاريخ ميلادك الأول يا قمر ❤️';
         return;
       }
-      // Only the birthday you provided unlocks the next screen.
-      if (birthdayInput.value !== '2006-10-19') {
+      // التحقق من التاريخ الصحيح 14/10/2007
+      if (birthdayInput.value !== '2007-10-14') {
         dateHint.textContent = 'التاريخ مش هو تاريخ المفاجأة، جرّبي تاني يا قمر ❤️';
         return;
       }
+      
+      bgMusic.play().catch(e => console.log(e));
+
       dateHint.textContent = '';
       showScreen('wishScreen');
       makePetals(18);
@@ -185,7 +234,6 @@
       }
     }
 
-    // Tiny decorative stars
     for (let i = 0; i < 18; i++) {
       const star = document.createElement('span');
       star.className = 'spark';

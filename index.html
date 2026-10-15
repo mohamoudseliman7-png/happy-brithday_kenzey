@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عيد ميلاد سعيد يا كنزي 🤍</title>
+    <!-- استيراد خط عربي رومانسي -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: #0b070f;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* شاشة القفل لتاريخ الميلاد */
+        #lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 7, 15, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
+        }
+
+        .lock-box {
+            background: rgba(255, 20, 147, 0.08);
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.2);
+            max-width: 90%;
+            width: 350px;
+        }
+
+        .lock-box h2 {
+            color: #ff3385;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .lock-box p {
+            color: #ddd;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .lock-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ff3385;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .lock-box button {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+            transition: 0.3s;
+        }
+
+        .lock-box button:hover {
+            transform: scale(1.03);
+        }
+
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* تأثير الماتريكس الرومانسي */
+        canvas#matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: none;
+        }
+
+        /* حاوية المحتوى الرئيسي */
+        #main-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* تصميم الكتاب وتجربة التقليب */
+        .book-container {
+            width: 340px;
+            height: 480px;
+            position: relative;
+            perspective: 1500px;
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform-origin: right;
+            transform-style: preserve-3d;
+            transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
+            background: linear-gradient(135deg, #1e1124, #2a1535);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            backface-visibility: hidden;
+        }
+
+        .page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .page h3 {
+            color: #ff69b4;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .page p {
+            color: #f1f1f1;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .heart-icon {
+            font-size: 50px;
+            margin: 20px 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .next-btn {
+            margin-top: 25px;
+            background: #ff1493;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(255,20,147,0.3);
+        }
+
+        /* الشاشة النهائية */
+        #final-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 20;
+            background: #0b070f;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #final-screen h1 {
+            color: #ff3385;
+            font-size: 30px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255, 51, 133, 0.6);
+        }
+
+        #final-screen p {
+            color: #fff;
+            font-size: 17px;
+            max-width: 400px;
+            line-height: 1.8;
+        }
+
+        /* زر التحكم بالموسيقى */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(255, 20, 147, 0.2);
+            border: 1px solid #ff69b4;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- مشغل أغنية "من أول دقيقة" -->
+    <audio id="birthday-audio" preload="auto" loop>
+        <source src="https://cdnsm.skyeg.net/music/elissa/Min_Awwal_Dekika_Elissa_Ft_Saad_Lamjarred.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="music-control" onclick="toggleMusic()">
+        🎵 <span id="music-text">تشغيل الموسيقى</span>
+    </button>
+
+    <!-- شاشة إدخال تاريخ الميلاد للتحقق -->
+    <div id="lock-screen">
+        <div class="lock-box">
+            <h2>مفتاح مفاجأتك الخاصة 🤍</h2>
+            <p>أدخلي تاريخ ميلادكِ للوصول إلى الهدية:</p>
+            <input type="text" id="birthday-input" placeholder="أدخلي تاريخ ميلادكِ...">
+            <button onclick="checkBirthday()">فتح الهدية ✨</button>
+            <div id="error-msg" class="error-msg">برجاء إدخال تاريخ الميلاد لفتح الهدية!</div>
+        </div>
+    </div>
+
+    <!-- شاشة تأثير الحروف المتساقطة Matrix -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- محتوى صفحات كتاب الذكريات -->
+    <div id="main-content">
+        <div class="book-container" id="book">
+            <!-- الصفحة الأولى -->
+            <div class="page" id="p1" style="z-index: 3;">
+                <h3>من أول دقيقة 🤍</h3>
+                <div class="heart-icon">💖</div>
+                <p>كل عام وأنتِ بقلبي، وكل سنة وأنتِ أجمل وأحلى أقدار حياتي يا كنزي..</p>
+                <button class="next-btn" onclick="nextPage(1)">اضغطي لقلب الصفحة 📖</button>
+            </div>
+            <!-- الصفحة الثانية -->
+            <div class="page" id="p2" style="z-index: 2;">
+                <h3>أجمل اللحظات</h3>
+                <div class="heart-icon">🌹</div>
+                <p>لو تطلبي مني عينيا، لو تطلبي عمري كمان.. هيديكي سنيني الجاية وهكون راضي وفرحان ❤️</p>
+                <button class="next-btn" onclick="nextPage(2)">التالي ✨</button>
+            </div>
+            <!-- الصفحة الثالثة -->
+            <div class="page" id="p3" style="z-index: 1;">
+                <h3>أمنية قلبي</h3>
+                <div class="heart-icon">👑</div>
+                <p>أعدكِ أن أظل بجانبكِ سنداً وفارساً لأحلامكِ في كل عيد ميلاد 🤍</p>
+                <button class="next-btn" onclick="showFinalScreen()">عرض المفاجأة الأخيرة ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- الشاشة النهائية -->
+    <div id="final-screen">
+        <div class="heart-icon" style="font-size: 80px;">❤️</div>
+        <h1>عيد ميلاد سعيد يا كنزي!</h1>
+        <p>كل ثانية وأنتِ بخير وصحة وسعادة، ودائماً مع بعض من أول دقيقة ولآخر العمر ❤️</p>
+    </div>
+
+    <script>
+        let isPlaying = false;
+
+        function checkBirthday() {
+            const inputVal = document.getElementById("birthday-input").value.trim();
+            const errorMsg = document.getElementById("error-msg");
+            const audio = document.getElementById("birthday-audio");
+
+            if (inputVal.length >= 2) {
+                // تشغيل الأغنية فور الضغط على الزرار
+                audio.play().then(() => {
+                    document.getElementById("music-text").innerText = "إيقاف الموسيقى";
+                    isPlaying = true;
+                }).catch(e => console.log("Audio play error:", e));
+
+                document.getElementById("lock-screen").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("lock-screen").style.display = "none";
+                    startMatrixEffect();
+                }, 800);
+            } else {
+                errorMsg.style.display = "block";
+            }
+        }
+
+        // تأثير الماتريكس الوردي
+        function startMatrixEffect() {
+            const canvas = document.getElementById("matrix-canvas");
+            canvas.style.display = "block";
+            const ctx = canvas.getContext("2d");
+
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+
+            const arabicWords = "من أول دقيقة بحبك يا كنزي كل عام وأنتِ بخير عيد ميلاد سعيد ❤️";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+
+            let counter = 0;
+            const matrixInterval = setInterval(() => {
+                ctx.fillStyle = "rgba(11, 7, 15, 0.1)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = "#ff3385";
+                ctx.font = fontSize + "px 'Cairo'";
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = arabicWords.charAt(Math.floor(Math.random() * arabicWords.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+
+                counter++;
+                if (counter > 70) {
+                    clearInterval(matrixInterval);
+                    canvas.style.display = "none";
+                    document.getElementById("main-content").style.display = "flex";
+                }
+            }, 50);
+        }
+
+        // تقليب الصفحات
+        function nextPage(pageNum) {
+            const page = document.getElementById("p" + pageNum);
+            page.classList.add("flipped");
+        }
+
+        // الشاشة الأخيرة
+        function showFinalScreen() {
+            document.getElementById("main-content").style.display = "none";
+            document.getElementById("final-screen").style.display = "flex";
+        }
+
+        // زر الموسيقى
+        function toggleMusic() {
+            const audio = document.getElementById("birthday-audio");
+            const text = document.getElementById("music-text");
+            if (isPlaying) {
+                audio.pause();
+                text.innerText = "تشغيل الموسيقى";
+                isPlaying = false;
+            } else {
+                audio.play();
+                text.innerText = "إيقاف الموسيقى";
+                isPlaying = true;
+            }
+        }
+    </script>
+</body>
+</html>
